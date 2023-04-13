@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import org.mockito.*;
+import org.mockito.internal.configuration.injection.MockInjection;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RentACatTest {
@@ -27,6 +28,9 @@ public class RentACatTest {
 
 	@Before
 	public void setUp() throws Exception {
+
+		//Config.setBuggyRentACat(false);
+
 		// Turn on automatic bug injection in the Cat class, to emulate a buggy Cat.
 		// Your unit tests should work regardless of these bugs.
 		Cat.bugInjectionOn = true;
@@ -36,13 +40,28 @@ public class RentACatTest {
 		r = RentACat.createInstance();
 
 		// 2. Create an unrented Cat with ID 1 and name "Jennyanydots", assign to c1
-		// TODO: Fill in
+		c1 = Mockito.mock(Cat.class);
+		Mockito.when(c1.getId()).thenReturn(1);
+		Mockito.when(c1.getName()).thenReturn("Jennyanydots");
+		Mockito.when(c1.toString()).thenReturn("ID 1. Jennyanydots");
+		//Mockito.when(c1.getRented()).thenReturn(false);
+		r.addCat(c1);
 
 		// 3. Create an unrented Cat with ID 2 and name "Old Deuteronomy", assign to c2
-		// TODO: Fill in
+		c2 = Mockito.mock(Cat.class);
+		Mockito.when(c2.getId()).thenReturn(2);
+		Mockito.when(c2.getName()).thenReturn("Old Deuteronomy");
+		Mockito.when(c2.toString()).thenReturn("ID 2. Old Deuteronomy");
+		//Mockito.when(c2.getRented()).thenReturn(false);
+		r.addCat(c2);
 
 		// 4. Create an unrented Cat with ID 3 and name "Mistoffelees", assign to c3
-		// TODO: Fill in
+		c3 = Mockito.mock(Cat.class);
+		Mockito.when(c3.getId()).thenReturn(3);
+		Mockito.when(c3.getName()).thenReturn("Mistoffelees");
+		Mockito.when(c3.toString()).thenReturn("ID 3. Mistoffelees");
+		//Mockito.when(c3.getRented()).thenReturn(false);
+		r.addCat(c3);
 	}
 
 	@After
@@ -56,6 +75,7 @@ public class RentACatTest {
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for Cat getCat(int id).
 	 * 
 	 * <pre>
@@ -67,10 +87,16 @@ public class RentACatTest {
 
 	@Test
 	public void testGetCatNullNumCats0() {
-		// TODO
+		//Create instance of empty cat
+		r = RentACat.createInstance();
+
+		//Execution step: we get the cat and we check that it is null
+		Cat cat = r.getCat(2);
+		assertNull(cat);
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for Cat getCat(int id).
 	 * 
 	 * <pre>
@@ -83,10 +109,15 @@ public class RentACatTest {
 
 	@Test
 	public void testGetCatNumCats3() {
-		// TODO
+
+		// Get cat and assert it is not null and ID is 2
+		Cat cat = r.getCat(2);
+		assertNotNull(cat);
+		assertEquals(2, cat.getId());
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean catAvailable(int id).
 	 * 
 	 * <pre>
@@ -98,10 +129,20 @@ public class RentACatTest {
 
 	@Test
 	public void testCatAvailableFalseNumCats0() {
-		// TODO
+		
+		// reset RentACat list - r has no cats
+		r = RentACat.createInstance();
+
+		// Assert no cats in r
+		String cats = r.listCats();
+		assertEquals("", cats);
+
+		boolean resultCatAvailable = r.catAvailable(c2.getId());
+		assertFalse("Cat ID: 2 is not available to rent", resultCatAvailable);
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean catAvailable(int id).
 	 * 
 	 * <pre>
@@ -115,10 +156,16 @@ public class RentACatTest {
 
 	@Test
 	public void testCatAvailableTrueNumCats3() {
-		// TODO
+
+		c3.rentCat();
+		Mockito.when(c3.getRented()).thenReturn(true);
+
+		boolean resultCatAvailable = r.catAvailable(c2.getId());
+		assertTrue("Cat ID: 2 is available to rent", resultCatAvailable);
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean catAvailable(int id).
 	 * 
 	 * <pre>
@@ -132,10 +179,16 @@ public class RentACatTest {
 
 	@Test
 	public void testCatAvailableFalseNumCats3() {
-		// TODO
+
+		c2.rentCat();
+		Mockito.when(c2.getRented()).thenReturn(true);
+
+		boolean resultCatAvailable = r.catAvailable(c2.getId());
+		assertFalse("Cat ID: 2 is not available", resultCatAvailable);
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean catExists(int id).
 	 * 
 	 * <pre>
@@ -147,10 +200,20 @@ public class RentACatTest {
 
 	@Test
 	public void testCatExistsFalseNumCats0() {
-		// TODO
+
+		// reset RentACat list - r has no cats
+		r = RentACat.createInstance();
+
+		// Assert no cats in r
+		String cats = r.listCats();
+		assertEquals("", cats);
+
+		boolean resultCatExists = r.catExists(c2.getId());
+		assertFalse("No cats are available for rent", resultCatExists);
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean catExists(int id).
 	 * 
 	 * <pre>
@@ -162,10 +225,13 @@ public class RentACatTest {
 
 	@Test
 	public void testCatExistsTrueNumCats3() {
-		// TODO
+
+		boolean resultCatExists = r.catExists(c2.getId());
+		assertTrue("Cat is available to rent", resultCatExists);
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for String listCats().
 	 * 
 	 * <pre>
@@ -177,10 +243,18 @@ public class RentACatTest {
 
 	@Test
 	public void testListCatsNumCats0() {
-		// TODO
+
+		//Create instance of empty cat
+		r = RentACat.createInstance();
+
+		// Assert no cats in r
+		String cats = r.listCats();
+		assertEquals("", cats);
+
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for String listCats().
 	 * 
 	 * <pre>
@@ -193,10 +267,13 @@ public class RentACatTest {
 
 	@Test
 	public void testListCatsNumCats3() {
-		// TODO
+		// Assert that all three cats have been added to r
+		String cats = r.listCats();
+		assertEquals("ID 1. Jennyanydots\nID 2. Old Deuteronomy\nID 3. Mistoffelees\n", cats);
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for boolean rentCat(int id).
 	 * 
 	 * <pre>
@@ -208,10 +285,19 @@ public class RentACatTest {
 
 	@Test
 	public void testRentCatFailureNumCats0() {
-		// TODO
+		//Create instance of empty cat
+		r = RentACat.createInstance();
+
+		// Assert no cats in r
+		String cats = r.listCats();
+		assertEquals("", cats);
+
+		boolean rent = r.rentCat(2);
+		assertFalse("There are no cats yet", rent);
 	}
 
 	/**
+	 * PARTNER 2: David Zapata
 	 * Test case for boolean rentCat(int id).
 	 * 
 	 * <pre>
@@ -229,10 +315,21 @@ public class RentACatTest {
 
 	@Test
 	public void testRentCatFailureNumCats3() {
-		// TODO
+		//Make sure that cat 2 is rented
+		Mockito.when(c2.getRented()).thenReturn(true);
+
+		//Try to rent cat 2
+		boolean rent = r.rentCat(2);
+		//Assert that we can't rent cat 2
+		assertFalse("Cat 2 is not available", rent);
+		//Verify that rentCat() was called for none of the cats
+		Mockito.verify(c1, Mockito.times(0)).rentCat();
+		Mockito.verify(c2, Mockito.times(0)).rentCat();
+		Mockito.verify(c3, Mockito.times(0)).rentCat();
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean returnCat(int id).
 	 * 
 	 * <pre>
@@ -244,10 +341,22 @@ public class RentACatTest {
 
 	@Test
 	public void testReturnCatFailureNumCats0() {
-		// TODO
+
+		// reset RentACat list - r has no cats
+		r = RentACat.createInstance();
+
+		// Assert no cats in r
+		String cats = r.listCats();
+		assertEquals("", cats);
+
+		//Mockito.when(c2.getId()).thenReturn(-1);
+
+		boolean testReturnCat = r.returnCat(c2.getId());
+		assertFalse("Cannot return Cat", testReturnCat);
 	}
 
 	/**
+	 * PARTNER 1: Ivan Bondarenko
 	 * Test case for boolean returnCat(int id).
 	 * 
 	 * <pre>
@@ -266,6 +375,20 @@ public class RentACatTest {
 
 	@Test
 	public void testReturnCatNumCats3() {
-		// TODO
+
+		// Precondition: c2 is rented
+		c2.rentCat();
+		
+		// Execution: returnCat(2) 
+		Mockito.when(c2.getRented()).thenReturn(true);
+		boolean testReturnCat = r.returnCat(c2.getId());
+
+		// Assert rented cat is returned
+		assertTrue("Cat not returned", testReturnCat);
+
+		// Behavior verification
+		Mockito.verify(c1, Mockito.times(0)).returnCat();
+		Mockito.verify(c2, Mockito.times(1)).returnCat();
+		Mockito.verify(c3, Mockito.times(0)).returnCat();
 	}
 }
